@@ -118,7 +118,7 @@ end, true, {help = TranslateCap('command_giveaccountmoney'), validate = true, ar
 	{name = 'amount', help = TranslateCap('command_giveaccountmoney_amount'), type = 'number'}
 }})
 
-if not Config.OxInventory then
+if not Config.OxInventory and not Config.QSInventory then
 	ESX.RegisterCommand('giveitem', 'admin', function(xPlayer, args, showError)
 		args.playerId.addInventoryItem(args.item, args.count)
 	end, true, {help = TranslateCap('command_giveitem'), validate = true, arguments = {
@@ -186,7 +186,7 @@ ESX.RegisterCommand("refreshjobs", 'admin', function(xPlayer, args, showError)
 	ESX.RefreshJobs()
 end, true, {help = TranslateCap('command_clearall')})
 
-if not Config.OxInventory then
+if not Config.OxInventory and not Config.QSInventory then
 	ESX.RegisterCommand('clearinventory', 'admin', function(xPlayer, args, showError)
 		for k,v in ipairs(args.playerId.inventory) do
 			if v.count > 0 then

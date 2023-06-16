@@ -182,6 +182,12 @@ function Core.SavePlayer(xPlayer, cb)
   )
 end
 
+AddEventHandler('onResourceStop', function(resourceName)
+  if (resourceName == "qs-inventory") then
+    Core.SavePlayers()
+  end
+end)
+
 function Core.SavePlayers(cb)
   local xPlayers <const> = ESX.Players
   if not next(xPlayers) then
@@ -349,11 +355,22 @@ end
 
 function ESX.RegisterUsableItem(item, cb)
   Core.UsableItemsCallbacks[item] = cb
+  if Config.QSInventory then
+    exports['qs-inventory']:CreateUsableItem(item, cb)
+  end
 end
+
+exports('GetUsableItems', function()
+  return Core.UsableItemsCallbacks
+end)
 
 function ESX.UseItem(source, item, ...)
   if ESX.Items[item] then
     local itemCallback = Core.UsableItemsCallbacks[item]
+
+    if Config.QSInventory then
+      return exports['qs-inventory']:UseItem(item, source, ...)
+    end
 
     if itemCallback then
       local success, result = pcall(itemCallback, source, item, ...)
@@ -381,6 +398,9 @@ function ESX.SetPlayerFunctionOverride(index)
 end
 
 function ESX.GetItemLabel(item)
+  if Config.QSInventory then
+    return exports['qs-inventory']:GetItemLabel(item)
+  end
   if Config.OxInventory then
     item = exports.ox_inventory:Items(item)
     if item then
@@ -407,7 +427,7 @@ function ESX.GetUsableItems()
   return Usables
 end
 
-if not Config.OxInventory then
+if not Config.OxInventory and not Config.QSInventory then
   function ESX.CreatePickup(type, name, count, label, playerId, components, tintIndex)
     local pickupId = (Core.PickupId == 65635 and 0 or Core.PickupId + 1)
     local xPlayer = ESX.Players[playerId]
